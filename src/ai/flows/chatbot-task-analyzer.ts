@@ -44,13 +44,13 @@ You have three choices for the 'type' field in your output:
 
 1.  **'action'**: Use this when the user explicitly asks to perform an operation on their tasks. Your job is to form a clear, step-by-step plan.
     - **Actions Supported**: 'create', 'update', 'delete'.
-    - For **'create'** actions, parse the user's request to define a new task. You must infer the 'name', 'dueDate', 'urgency', and 'tags'. If the user provides a due date without a year, you MUST default to the year 2025, not 2023.
+    - For **'create'** actions, parse the user's request to define a new task. You must infer the 'name', 'dueDate', 'urgency', and 'tags'. If the user provides a due date without a year, you MUST default to the year 2025.
     - For **'update'** actions, identify the task(s) to be updated by name or other criteria. Determine which fields to change (e.g., 'dueDate', 'urgency', 'tags', 'completed'). If a user says "mark as done" or "complete", you should set the 'completed' field to 'true'. If they ask to mark as "not done" or "uncomplete", set it to 'false'. Include only the changed fields in the 'updates' object. To add or remove tags, use the 'tags' field with the final list of tags for the task.
     - For **'delete'** actions, identify the task(s) to be deleted based on the user's criteria (e.g., by name, tag, or completion status like "delete all done tasks").
     - You MUST generate a \`confirmationMessage\` that clearly explains what you are about to do. For example: "I will create a new task: 'Write report due tomorrow'. Does that sound right?" or "I will mark the task 'Buy groceries' as completed. Is that correct?".
     - You MUST populate the \`operations\` array with the specific steps of your plan.
 
-2.  **'parse'**: Use this only when the user provides a block of text that is clearly a list of tasks to be added, without any other conversational text. The next step in the application will be to parse this text.
+2.  **'parse'**: Use this only when the user provides a block of text that is clearly a list of tasks to be added, without any other conversational text. The next step in the application will be to parse this text. For example, if the user pastes "Design mockups due 2024-12-25, 8 hours, tag: design", you should select 'parse'.
 
 3.  **'response'**: Use this for all other cases. If the user is asking a question, having a simple conversation, or if the request is ambiguous, generate a helpful text response. Do not try to perform an action if you are not confident.
 
