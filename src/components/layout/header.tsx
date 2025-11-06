@@ -18,11 +18,15 @@ export function AppHeader() {
           strokeLinejoin="round"
           className="h-6 w-6 text-primary"
         >
-          <path d="M5 12V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7" />
-          <path d="M5 12H3.5a1.5 1.5 0 0 0 0 3H5" />
-          <path d="M19 12h1.5a1.5 1.5 0 0 1 0 3H19" />
-          <path d="M12 12v7" />
-          <path d="M9 20h6" />
+          <path d="M8 17a4 4 0 0 0 8 0" />
+          <path d="M9 13h6" />
+          <path d="M12 3v1" />
+          <path d="M18.7 5.3a2.4 2.4 0 0 0-3.4 0" />
+          <path d="M5.3 5.3a2.4 2.4 0 0 1 3.4 0" />
+          <path d="M21 11.5a6.5 6.5 0 0 0-11-5.2" />
+          <path d="M3 11.5a6.5 6.5 0 0 1 11-5.2" />
+          <path d="M3.5 17.5a2.5 2.5 0 0 0 4 0" />
+          <path d="M16.5 17.5a2.5 2.5 0 0 1-4 0" />
         </svg>
         <h1 className="text-xl font-semibold">TaskZen</h1>
       </Link>
