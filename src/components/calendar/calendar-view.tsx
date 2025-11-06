@@ -105,52 +105,52 @@ export function CalendarView() {
                     height: 100%;
                     margin: 0;
                 }
-                .rdp-months {
-                    flex: 1;
-                    display: flex;
-                }
                 .rdp-month {
-                    flex: 1;
                     display: flex;
                     flex-direction: column;
-                    margin: 0 !important;
-                }
-                .rdp-caption {
-                    margin: 0 !important;
-                    padding: 0.25rem 0.5rem;
+                    flex-grow: 1;
+                    width: 100%;
+                    height: 100%;
                 }
                 .rdp-table {
                     flex-grow: 1;
-                    display: flex;
-                    flex-direction: column;
+                    display: table;
                     width: 100%;
-                    border-collapse: separate;
+                    height: 100%;
+                    border-collapse: collapse;
+                    table-layout: fixed;
                     border-spacing: 0;
                 }
                 .rdp-tbody {
-                    flex-grow: 1;
-                    display: flex;
-                    flex-direction: column;
+                    display: table-row-group;
+                    height: 100%;
                 }
                 .rdp-row {
-                    flex: 1;
-                    display: flex;
+                    display: table-row;
                     width: 100%;
+                    height: calc(100% / 6); /* Evenly divide height */
+                }
+                .rdp-cell {
+                    display: table-cell;
+                    padding: 0;
+                    margin: 0;
+                    vertical-align: top;
+                    border: 1px solid hsl(var(--border));
+                    border-radius: var(--radius);
                 }
                 .rdp-day {
-                    flex: 1;
-                    display: flex;
-                    align-items: stretch;
-                    justify-content: stretch;
-                    height: auto;
+                    height: 100%;
                     width: 100%;
                     padding: 0;
                     margin: 0;
                     border-radius: var(--radius);
-                    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                    transition: background-color 0.2s ease-in-out;
                 }
                 .rdp-day_outside {
                     opacity: 0.5;
+                }
+                 .rdp-day:hover {
+                    background-color: hsl(var(--accent) / 0.5);
                 }
                 .day-animated {
                     animation: fadeIn 0.5s ease-out forwards;
@@ -161,21 +161,16 @@ export function CalendarView() {
                         opacity: 1;
                     }
                 }
-                .rdp-day:hover {
-                    background-color: hsl(var(--accent) / 0.5);
-                }
-                .rdp-day, .rdp-head_cell {
-                    border: 1px solid hsl(var(--border));
-                    border-radius: var(--radius);
+                .rdp-head_row {
+                    display: table-row;
                 }
                 .rdp-head_cell {
+                    display: table-cell;
                     text-align: center;
                     height: 40px;
                     line-height: 40px;
-                    flex: 1;
-                }
-                .rdp-head_row {
-                    display: flex;
+                    border: 1px solid hsl(var(--border));
+                    border-radius: var(--radius);
                 }
                 .rdp-caption_label {
                     font-size: 1.5rem;
