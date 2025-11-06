@@ -57,6 +57,10 @@ export function CalendarView() {
                 .rdp-day {
                     height: 120px;
                     width: 120px;
+                    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                }
+                .rdp-day:hover {
+                    background-color: hsl(var(--accent) / 0.5);
                 }
                 .rdp-table {
                     border-collapse: collapse;

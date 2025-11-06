@@ -21,6 +21,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ArrowUpDown, ChevronsUpDown, PlusCircle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { cn } from '@/lib/utils';
 
 type SortKey = 'dueDate' | 'urgency' | 'requiredHours' | 'name';
 type SortDirection = 'asc' | 'desc';
@@ -120,7 +121,7 @@ export function TasksBoard() {
           Add Task
         </Button>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -133,11 +134,12 @@ export function TasksBoard() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAndSortedTasks.map((task) => (
+            {filteredAndSortedTasks.map((task, index) => (
               <TableRow
                 key={task.id}
                 onClick={() => setTaskToEdit(task)}
-                className="cursor-pointer"
+                className="cursor-pointer animate-in fade-in-0"
+                style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
                 data-state={task.completed ? 'completed' : ''}
               >
                 <TableCell>
