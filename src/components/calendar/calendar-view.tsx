@@ -96,7 +96,7 @@ export function CalendarView() {
     }
 
     return (
-        <div className='w-full h-full flex flex-col'>
+        <div className='w-full h-full flex flex-col flex-1'>
             <style>{`
                 .rdp {
                     width: 100%;
