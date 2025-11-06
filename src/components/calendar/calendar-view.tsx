@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DayPicker, DayProps, CaptionProps, useNavigation } from 'react-day-picker';
+import { DayPicker, DayProps, CaptionProps, useNavigation, DayContentProps } from 'react-day-picker';
 import { isSameDay, isSameMonth, format } from 'date-fns';
 import { useApp } from '@/hooks/use-app';
 import { Task } from '@/lib/types';
@@ -12,20 +12,13 @@ import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-function DayContent(props: DayProps) {
+function DayContent(props: DayContentProps) {
     const { tasks } = useApp();
     const tasksForDay = tasks.filter(task => isSameDay(task.dueDate, props.date));
     const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(undefined);
     
-    const isCurrentMonth = isSameMonth(props.date, props.displayMonth);
-
-    const dayIndex = props.date.getDate() + props.date.getMonth() * 31;
-
     return (
-        <div 
-            className={cn("relative flex flex-col h-full w-full p-1", !isCurrentMonth && "opacity-50")}
-            style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'both' }}
-            >
+        <div className="relative flex flex-col h-full w-full p-1">
             <p className='text-xs self-start'>{props.date.getDate()}</p>
             <div className='flex-1 overflow-y-auto space-y-1 mt-1'>
                 {tasksForDay.map(task => (
@@ -84,9 +77,12 @@ export function CalendarView() {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isClient, setIsClient] = useState(false);
+    const [animationKey, setAnimationKey] = useState(0);
 
     useEffect(() => {
         setIsClient(true);
+        // Increment key to re-trigger animation when component is shown
+        setAnimationKey(prev => prev + 1);
     }, []);
 
     const handleDayClick = (day: Date) => {
@@ -135,7 +131,10 @@ export function CalendarView() {
                     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
                     border-radius: var(--radius);
                 }
-                .rdp-day:not([data-outside="true"]) {
+                .rdp-day_outside {
+                    opacity: 0.5;
+                }
+                .day-animated {
                     animation: fadeIn 0.5s ease-out forwards;
                     opacity: 0;
                 }
@@ -167,7 +166,26 @@ export function CalendarView() {
                 }
             `}</style>
             <DayPicker
-                components={{ DayContent, Caption: CustomCaption }}
+                key={animationKey}
+                components={{ 
+                    DayContent, 
+                    Caption: CustomCaption,
+                    Day: (props: DayProps) => {
+                      const dayIndex = props.date.getDate() + props.date.getMonth() * 31;
+                      const isOutside = isSameMonth(props.date, props.displayMonth);
+                      return (
+                        <div
+                          className='day-animated'
+                          style={{
+                            animationDelay: `${dayIndex * 10}ms`,
+                            animationFillMode: 'forwards',
+                          }}
+                        >
+                            <DayPicker.defaultProps.components.Day {...props} />
+                        </div>
+                      )
+                    }
+                }}
                 showOutsideDays
                 onDayClick={handleDayClick}
                 className="w-full h-full flex flex-col"
@@ -176,7 +194,6 @@ export function CalendarView() {
                     month: 'flex flex-col flex-1 w-full h-full',
                     table: 'w-full h-full table-fixed border-collapse border-spacing-1',
                     row: 'w-full',
-                    day: 'w-full h-full',
                 }}
             />
 
