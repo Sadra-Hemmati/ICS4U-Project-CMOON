@@ -13,6 +13,7 @@ export interface AppContextType {
   addTasks: (tasks: Omit<Task, 'id' | 'completed'>[]) => void;
   updateTask: (id: string, updates: Partial<Omit<Task, 'id'>>) => void;
   deleteTask: (id: string) => void;
+  deleteTasks: (ids: string[]) => void;
   toggleTaskCompletion: (id: string) => void;
   getTagById: (id: string) => Tag | undefined;
   findOrCreateTags: (tagNames: string[]) => string[];
@@ -77,6 +78,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setTasks(prev => prev.filter(t => t.id !== id));
   }, []);
 
+  const deleteTasks = useCallback((ids: string[]) => {
+    setTasks(prev => prev.filter(t => !ids.includes(t.id)));
+  }, []);
+
   const toggleTaskCompletion = useCallback((id: string) => {
     setTasks(prev => prev.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)));
   }, []);
@@ -88,6 +93,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     addTasks,
     updateTask,
     deleteTask,
+    deleteTasks,
     toggleTaskCompletion,
     getTagById,
     findOrCreateTags,
