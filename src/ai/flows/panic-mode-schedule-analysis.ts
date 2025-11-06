@@ -4,64 +4,84 @@
  * @fileOverview Analyzes the user's schedule and suggests a plan to complete as many tasks as possible on time when the user is feeling overwhelmed.
  *
  * - panicModeScheduleAnalysis - A function that handles the schedule analysis process.
- * - PanicModeScheduleAnalysisInput - The input type for the panicModeScheduleAnalysis function, which is a list of tasks.
- * - PanicModeScheduleAnalysisOutput - The return type for the panicModeScheduleAnalysis function, which provides a plan to complete as many tasks as possible.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { isAfter, isBefore, startOfToday, endOfToday, endOfWeek } from 'date-fns';
+import {
+    PanicModeScheduleAnalysisInputSchema,
+    PanicModeScheduleAnalysisInput,
+    PanicModeScheduleAnalysisOutput,
+    ActionPlanStepSchema,
+} from '@/ai/schemas/panic-mode-schemas';
 
-const TaskSchema = z.object({
-  name: z.string().describe('The name of the task.'),
-  dueDate: z.string().describe('The due date of the task in ISO format.'),
-  urgency: z.enum(['high', 'medium', 'low']).optional().describe('The urgency level of the task. Can be high, medium, or low.'),
-  requiredHoursOfWork: z.number().optional().describe('The estimated required hours of work to complete the task.'),
-  tags: z.array(z.string()).optional().describe('Tags or categories associated with the task.'),
-});
+export type {
+    PanicModeScheduleAnalysisInput,
+    PanicModeScheduleAnalysisOutput,
+} from '@/ai/schemas/panic-mode-schemas';
 
-const PanicModeScheduleAnalysisInputSchema = z.object({
-  tasks: z.array(TaskSchema).describe('A list of tasks to analyze.'),
-});
-export type PanicModeScheduleAnalysisInput = z.infer<
-  typeof PanicModeScheduleAnalysisInputSchema
->;
-
-const PanicModeScheduleAnalysisOutputSchema = z.object({
-  plan: z
-    .string()
-    .describe(
-      'A detailed plan to complete as many tasks as possible on time, considering due dates, urgency levels, and required hours of work.'
-    ),
-});
-export type PanicModeScheduleAnalysisOutput = z.infer<
-  typeof PanicModeScheduleAnalysisOutputSchema
->;
 
 export async function panicModeScheduleAnalysis(
   input: PanicModeScheduleAnalysisInput
 ): Promise<PanicModeScheduleAnalysisOutput> {
-  return panicModeScheduleAnalysisFlow(input);
+  const today = startOfToday();
+  const summary = input.tasks.reduce((acc, task) => {
+    const dueDate = new Date(task.dueDate);
+    acc.totalTasks += 1;
+    acc.totalWorkHours += task.requiredHours || 0;
+    if (task.urgency === 'high') {
+      acc.highPriorityHours += task.requiredHours || 0;
+    }
+    if (isBefore(dueDate, today)) {
+        acc.overdueTasks += 1;
+    }
+    if (isAfter(dueDate, today) && isBefore(dueDate, endOfToday())) {
+        acc.dueToday += 1;
+    }
+    if (isAfter(dueDate, today) && isBefore(dueDate, endOfWeek(today))) {
+        acc.dueThisWeek += 1;
+    }
+    return acc;
+  }, {
+    totalTasks: 0,
+    totalWorkHours: 0,
+    highPriorityHours: 0,
+    overdueTasks: 0,
+    dueToday: 0,
+    dueThisWeek: 0,
+  });
+
+  const { output } = await panicModeScheduleAnalysisFlow(input);
+
+  return {
+    summary,
+    actionPlan: output!.actionPlan,
+  };
 }
 
 const prompt = ai.definePrompt({
   name: 'panicModeScheduleAnalysisPrompt',
   input: {schema: PanicModeScheduleAnalysisInputSchema},
-  output: {schema: PanicModeScheduleAnalysisOutputSchema},
-  prompt: `You are a personal assistant specializing in time management and task prioritization. Given a list of tasks with their due dates, urgency levels, and required hours of work, you will generate a plan to complete as many tasks as possible on time.
+  output: {schema: z.object({ actionPlan: z.array(ActionPlanStepSchema) })},
+  prompt: `You are a personal assistant specializing in time management and task prioritization. 
+  Your goal is to help a user who is feeling overwhelmed by creating a clear, actionable plan.
+  The output should be a JSON object with a single key "actionPlan".
 
-  Consider the urgency, due date, and estimated required hours of work for each task to create the most efficient plan. Prioritize tasks with higher urgency and earlier due dates, but also consider the time required for each task to avoid overcommitment.
-  The plan should be realistic and actionable, providing a step-by-step guide for the user to follow.
+  The "actionPlan" should be an array of steps. Two common steps are:
+  1. "Immediate Action Required": This should contain any tasks that are overdue.
+  2. "Today's Focus": This should contain tasks due today.
 
-  Tasks:
+  For each step, provide a clear title and description. The 'tasks' array should list the tasks for that step, including their ID, name, required hours, and priority.
+  
+  Prioritize tasks based on due date and urgency. Be realistic and focus on what's most critical.
+
+  Here is the list of tasks:
   {{#each tasks}}
-  - Name: {{name}}
-    Due Date: {{dueDate}}
-    Urgency: {{urgency}}
-    Required Hours: {{requiredHoursOfWork}}
-    Tags: {{tags}}
+  - ID: {{id}}, Name: {{name}}, Due Date: {{dueDate}}, Urgency: {{urgency}}, Required Hours: {{requiredHours}}
   {{/each}}
 
-  Based on the information above, provide a detailed plan to complete as many tasks as possible on time:
+  Generate the JSON output now.
   `,
 });
 
@@ -69,7 +89,7 @@ const panicModeScheduleAnalysisFlow = ai.defineFlow(
   {
     name: 'panicModeScheduleAnalysisFlow',
     inputSchema: PanicModeScheduleAnalysisInputSchema,
-    outputSchema: PanicModeScheduleAnalysisOutputSchema,
+    outputSchema: z.object({ actionPlan: z.array(ActionPlanStepSchema) }),
   },
   async input => {
     const {output} = await prompt(input);
