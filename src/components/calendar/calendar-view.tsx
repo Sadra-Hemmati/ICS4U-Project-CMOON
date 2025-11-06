@@ -97,14 +97,12 @@ export function CalendarView() {
             <DayPicker
                 components={{
                     DayContent,
-                    day: (dayProps) => {
+                    Day: (dayProps) => {
                         const dayIndex = dayProps.date.getDate() + dayProps.date.getMonth() * 31;
-                        return (
-                           <div style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'both' }}>
-                              <DayPicker.defaultProps.components!.day {...dayProps} />
-                           </div>
-                        )
-                   },
+                        const Day = DayPicker.defaultProps.components?.Day ?? 'div';
+                        // @ts-ignore
+                        return <Day {...dayProps} style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'both' }} />;
+                    },  
                 }}
                 className="w-full"
                 classNames={{
