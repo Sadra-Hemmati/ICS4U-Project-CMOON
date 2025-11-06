@@ -18,17 +18,17 @@ function DayContent(props: DayContentProps) {
     const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(undefined);
     
     return (
-        <div className="relative h-full w-full flex flex-col">
-            <div className="flex justify-center p-1">
+        <div className="relative h-full w-full flex flex-col p-1">
+            <div className="flex justify-center">
                 <p className='text-xs text-muted-foreground'>{props.date.getDate()}</p>
             </div>
-            <div className='flex-1 overflow-y-auto space-y-1 p-1 pt-0'>
+            <div className='flex-1 overflow-y-auto space-y-1 pt-1'>
                 {tasksForDay.map(task => (
                     <div 
                         key={task.id}
                         onClick={(e) => { e.stopPropagation(); setTaskToEdit(task); }}
                         className={cn(
-                            "text-sm rounded-sm px-1 cursor-pointer hover:opacity-80 line-clamp-2",
+                            "text-xs rounded-sm px-1 cursor-pointer hover:opacity-80 line-clamp-2",
                             task.completed ? 'line-through bg-green-900/50' : 'bg-primary/20'
                         )}
                     >
@@ -99,40 +99,55 @@ export function CalendarView() {
         <div className='w-full h-full flex flex-col flex-1'>
             <style>{`
                 .rdp {
+                    display: flex;
+                    flex-direction: column;
                     width: 100%;
                     height: 100%;
                     margin: 0;
                 }
                 .rdp-months {
-                    height: 100%;
-                    width: 100%;
+                    flex: 1;
+                    display: flex;
                 }
                 .rdp-month {
-                    height: 100%;
-                    width: 100%;
+                    flex: 1;
                     display: flex;
                     flex-direction: column;
+                    margin: 0 !important;
+                }
+                .rdp-caption {
+                    margin: 0 !important;
+                    padding: 0.25rem 0.5rem;
                 }
                 .rdp-table {
                     flex-grow: 1;
+                    display: flex;
+                    flex-direction: column;
                     width: 100%;
                     border-collapse: separate;
-                    border-spacing: 4px;
-                    table-layout: fixed;
+                    border-spacing: 0;
                 }
-                 .rdp-tbody {
-                    height: 100%;
+                .rdp-tbody {
+                    flex-grow: 1;
+                    display: flex;
+                    flex-direction: column;
                 }
                 .rdp-row {
-                    height: calc(100% / 6); /* Adjust based on number of weeks shown */
+                    flex: 1;
+                    display: flex;
                     width: 100%;
                 }
                 .rdp-day {
-                    height: 100%;
+                    flex: 1;
+                    display: flex;
+                    align-items: stretch;
+                    justify-content: stretch;
+                    height: auto;
                     width: 100%;
-                    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-                    border-radius: var(--radius);
                     padding: 0;
+                    margin: 0;
+                    border-radius: var(--radius);
+                    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
                 }
                 .rdp-day_outside {
                     opacity: 0.5;
@@ -151,23 +166,23 @@ export function CalendarView() {
                 }
                 .rdp-day, .rdp-head_cell {
                     border: 1px solid hsl(var(--border));
-                    vertical-align: top;
                     border-radius: var(--radius);
                 }
                 .rdp-head_cell {
                     text-align: center;
                     height: 40px;
-                    vertical-align: middle;
+                    line-height: 40px;
+                    flex: 1;
                 }
-                 .rdp-caption_label {
-                    font-size: 1.5rem; /* Increased font size */
+                .rdp-head_row {
+                    display: flex;
+                }
+                .rdp-caption_label {
+                    font-size: 1.5rem;
                     font-weight: 600;
                 }
-                .rdp-caption {
-                    margin-bottom: 1rem; /* Increased margin */
-                    padding: 0 0.5rem;
-                }
             `}</style>
+
             <DayPicker
                 key={animationKey}
                 components={{ 
@@ -178,11 +193,6 @@ export function CalendarView() {
                 onDayClick={handleDayClick}
                 className="w-full flex flex-col flex-1"
                 classNames={{
-                    months: 'flex flex-col flex-1 w-full h-full',
-                    month: 'flex flex-col flex-1 w-full h-full',
-                    table: 'w-full h-full table-fixed border-collapse border-spacing-1',
-                    tbody: 'h-full',
-                    row: 'w-full h-full',
                     day: 'day-animated',
                 }}
             />
