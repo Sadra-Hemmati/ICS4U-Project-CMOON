@@ -22,6 +22,8 @@ import { ArrowUpDown, ChevronsUpDown, PlusCircle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { cn } from '@/lib/utils';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
 
 type SortKey = 'dueDate' | 'urgency' | 'requiredHours' | 'name';
 type SortDirection = 'asc' | 'desc';
@@ -35,17 +37,27 @@ export function TasksBoard() {
   const [sortKey, setSortKey] = useState<SortKey>('dueDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [hideCompleted, setHideCompleted] = useState(false);
+
 
   const filteredAndSortedTasks = useMemo(() => {
     let filtered = tasks;
 
+    if (hideCompleted) {
+        filtered = filtered.filter(task => !task.completed);
+    }
+    
     if (selectedTags.length > 0) {
-      filtered = tasks.filter(task =>
+      filtered = filtered.filter(task =>
         selectedTags.every(tagId => task.tags.includes(tagId))
       );
     }
     
     return filtered.sort((a, b) => {
+      if (a.completed !== b.completed) {
+        return a.completed ? 1 : -1;
+      }
+      
       let comparison = 0;
       switch (sortKey) {
         case 'dueDate':
@@ -63,7 +75,7 @@ export function TasksBoard() {
       }
       return sortDirection === 'asc' ? comparison : -comparison;
     });
-  }, [tasks, sortKey, sortDirection, selectedTags]);
+  }, [tasks, sortKey, sortDirection, selectedTags, hideCompleted]);
   
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -86,7 +98,7 @@ export function TasksBoard() {
   return (
     <>
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
             <Popover>
                 <PopoverTrigger asChild>
                     <Button variant="outline" className="w-[180px] justify-between">
@@ -115,6 +127,10 @@ export function TasksBoard() {
                     </div>
                 </PopoverContent>
             </Popover>
+            <div className="flex items-center space-x-2">
+                <Switch id="hide-completed" checked={hideCompleted} onCheckedChange={setHideCompleted} />
+                <Label htmlFor="hide-completed">Hide completed</Label>
+            </div>
         </div>
         <Button onClick={() => setIsFormOpen(true)}>
           <PlusCircle className="mr-2 h-4 w-4" />
@@ -138,7 +154,7 @@ export function TasksBoard() {
               <TableRow
                 key={task.id}
                 onClick={() => setTaskToEdit(task)}
-                className="cursor-pointer animate-in fade-in-0"
+                className={cn("cursor-pointer transition-opacity", task.completed && "opacity-50")}
                 style={{ animationDelay: `${index * 25}ms`, animationFillMode: 'both' }}
                 data-state={task.completed ? 'completed' : ''}
               >
@@ -149,7 +165,7 @@ export function TasksBoard() {
                     onCheckedChange={() => toggleTaskCompletion(task.id)}
                   />
                 </TableCell>
-                <TableCell className="font-medium">{task.name}</TableCell>
+                <TableCell className={cn("font-medium", task.completed && "line-through")}>{task.name}</TableCell>
                 <TableCell>
                   {task.urgency && (
                     <Badge variant={getUrgencyVariant(task.urgency)}>

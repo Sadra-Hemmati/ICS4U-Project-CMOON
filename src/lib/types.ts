@@ -1,4 +1,4 @@
-import { ActionPlan } from "./schemas/task-analyzer-schemas";
+import { ActionPlan } from "@/ai/schemas/task-analyzer-schemas";
 
 export type Urgency = "low" | "medium" | "high";
 
