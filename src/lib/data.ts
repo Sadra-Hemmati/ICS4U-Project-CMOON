@@ -13,6 +13,7 @@ export const initialTags: Tag[] = [
     createTag('Q3 Marketing'),
     createTag('Website Redesign'),
     createTag('Personal'),
+    createTag('Example'),
 ];
 
 const now = new Date('2024-08-01T12:00:00.000Z');
@@ -24,7 +25,7 @@ export const initialTasks: Task[] = [
         dueDate: add(now, { days: 5 }),
         urgency: 'high',
         requiredHours: 10,
-        tags: ['website-redesign', 'project-phoenix'],
+        tags: ['website-redesign', 'project-phoenix', 'example'],
         completed: false,
     },
     {
@@ -33,7 +34,7 @@ export const initialTasks: Task[] = [
         dueDate: add(now, { days: 8 }),
         urgency: 'high',
         requiredHours: 16,
-        tags: ['project-phoenix'],
+        tags: ['project-phoenix', 'example'],
         completed: false,
     },
     {
@@ -42,7 +43,7 @@ export const initialTasks: Task[] = [
         dueDate: add(now, { days: 12 }),
         urgency: 'medium',
         requiredHours: 8,
-        tags: ['q3-marketing'],
+        tags: ['q3-marketing', 'example'],
         completed: false,
     },
     {
@@ -51,7 +52,7 @@ export const initialTasks: Task[] = [
         dueDate: add(now, { days: 7 }),
         urgency: 'low',
         requiredHours: 4,
-        tags: ['q3-marketing'],
+        tags: ['q3-marketing', 'example'],
         completed: true,
     },
     {
@@ -60,7 +61,7 @@ export const initialTasks: Task[] = [
         dueDate: add(now, { days: 3 }),
         urgency: 'medium',
         requiredHours: 1,
-        tags: ['personal'],
+        tags: ['personal', 'example'],
         completed: false,
     },
     {
@@ -69,7 +70,7 @@ export const initialTasks: Task[] = [
         dueDate: add(now, { days: 2 }),
         urgency: 'high',
         requiredHours: 5,
-        tags: ['project-phoenix'],
+        tags: ['project-phoenix', 'example'],
         completed: false,
     }
 ];
