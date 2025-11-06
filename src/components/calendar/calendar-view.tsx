@@ -58,12 +58,14 @@ export function CalendarView() {
                     height: 120px;
                     width: 120px;
                     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                    border-radius: var(--radius);
                 }
                 .rdp-day:hover {
                     background-color: hsl(var(--accent) / 0.5);
                 }
                 .rdp-table {
-                    border-collapse: collapse;
+                    border-collapse: separate;
+                    border-spacing: 4px;
                 }
                 .rdp-day, .rdp-head_cell {
                     border: 1px solid hsl(var(--border));
@@ -73,6 +75,7 @@ export function CalendarView() {
                     text-align: center;
                     height: 40px;
                     vertical-align: middle;
+                    border-radius: var(--radius);
                 }
             `}</style>
             <DayPicker
