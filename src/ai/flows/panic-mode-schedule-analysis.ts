@@ -26,6 +26,14 @@ export async function panicModeScheduleAnalysis(
   input: PanicModeScheduleAnalysisInput
 ): Promise<PanicModeScheduleAnalysisOutput> {
   const today = startOfToday();
+
+  if (input.tasks.length === 0) {
+    return {
+      summary: { totalTasks: 0, totalWorkHours: 0, highPriorityHours: 0, overdueTasks: 0, dueToday: 0, dueThisWeek: 0 },
+      actionPlan: [{ title: 'All Clear!', description: "You have no pending tasks. Great job!", tasks: [] }]
+    };
+  }
+
   const summary = input.tasks.reduce((acc, task) => {
     const dueDate = new Date(task.dueDate);
     acc.totalTasks += 1;
