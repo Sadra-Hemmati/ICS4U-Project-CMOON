@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DayPicker, DayProps } from 'react-day-picker';
 import { isSameDay, isSameMonth } from 'date-fns';
 import { useApp } from '@/hooks/use-app';
@@ -8,6 +8,7 @@ import { Task } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { TaskFormSheet } from '../tasks/task-form-sheet';
+import { Skeleton } from '../ui/skeleton';
 
 function DayContent(props: DayProps) {
     const { tasks } = useApp();
@@ -43,13 +44,24 @@ function DayContent(props: DayProps) {
 }
 
 export function CalendarView() {
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+        setSelectedDate(new Date());
+    }, []);
+
 
     const handleDayClick = (day: Date) => {
         setSelectedDate(day);
         setIsFormOpen(true);
     };
+
+    if (!isClient) {
+        return <Skeleton className="w-full h-[700px]" />;
+    }
 
     return (
         <>
