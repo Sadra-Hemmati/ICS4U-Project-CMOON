@@ -18,9 +18,11 @@ function DayContent(props: DayContentProps) {
     const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(undefined);
     
     return (
-        <div className="relative h-full w-full p-1">
-            <p className='absolute top-1 left-1 text-xs'>{props.date.getDate()}</p>
-            <div className='mt-5 flex-1 overflow-y-auto space-y-1 h-[calc(100%-1.25rem)]'>
+        <div className="relative h-full w-full flex flex-col">
+            <div className="p-1">
+                <p className='text-xs text-muted-foreground'>{props.date.getDate()}</p>
+            </div>
+            <div className='flex-1 overflow-y-auto space-y-1 p-1 pt-0'>
                 {tasksForDay.map(task => (
                     <div 
                         key={task.id}
@@ -129,6 +131,7 @@ export function CalendarView() {
                     width: 100%;
                     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
                     border-radius: var(--radius);
+                    padding: 0;
                 }
                 .rdp-day_outside {
                     opacity: 0.5;
