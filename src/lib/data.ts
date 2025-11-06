@@ -15,7 +15,7 @@ export const initialTags: Tag[] = [
     createTag('Personal'),
 ];
 
-const now = new Date();
+const now = new Date('2024-08-01T12:00:00.000Z');
 
 export const initialTasks: Task[] = [
     {
