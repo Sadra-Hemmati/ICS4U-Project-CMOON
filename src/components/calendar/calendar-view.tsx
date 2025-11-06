@@ -50,8 +50,13 @@ export function CalendarView() {
 
     useEffect(() => {
         setIsClient(true);
-        setSelectedDate(new Date());
     }, []);
+
+    useEffect(() => {
+        if (isClient) {
+            setSelectedDate(new Date());
+        }
+    }, [isClient]);
 
 
     const handleDayClick = (day: Date) => {
@@ -89,24 +94,15 @@ export function CalendarView() {
                 .rdp-day, .rdp-head_cell {
                     border: 1px solid hsl(var(--border));
                     vertical-align: top;
+                    border-radius: var(--radius);
                 }
                 .rdp-head_cell {
                     text-align: center;
                     height: 40px;
                     vertical-align: middle;
-                    border-radius: var(--radius);
                 }
             `}</style>
             <DayPicker
-                className="w-full"
-                classNames={{
-                    months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full',
-                    month: 'space-y-4 w-full',
-                    table: 'w-full border-collapse',
-                    row: 'w-full',
-                    caption_label: "text-lg font-medium",
-                    day: "animate-in fade-in-0",
-                }}
                 components={{
                     DayContent,
                     day: (dayProps) => {
@@ -117,6 +113,15 @@ export function CalendarView() {
                            </div>
                         )
                    },
+                }}
+                className="w-full"
+                classNames={{
+                    months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full',
+                    month: 'space-y-4 w-full',
+                    table: 'w-full border-collapse',
+                    row: 'w-full',
+                    caption_label: "text-lg font-medium",
+                    day: "animate-in fade-in-0",
                 }}
                 showOutsideDays
                 onDayClick={handleDayClick}
