@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useApp } from '@/hooks/use-app';
 import { Task } from '@/lib/types';
 import {
@@ -34,11 +34,6 @@ export function TasksBoard() {
   const [sortKey, setSortKey] = useState<SortKey>('dueDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const filteredAndSortedTasks = useMemo(() => {
     let filtered = tasks;
@@ -86,10 +81,6 @@ export function TasksBoard() {
         </Button>
     </TableHead>
   );
-  
-  if (!isClient) {
-    return null;
-  }
 
   return (
     <>
