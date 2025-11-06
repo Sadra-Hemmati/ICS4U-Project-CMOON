@@ -27,7 +27,7 @@ const TaskAdviceInputSchema = z.object({
 export type TaskAdviceInput = z.infer<typeof TaskAdviceInputSchema>;
 
 const TaskAdviceOutputSchema = z.object({
-  advice: z.string().describe('Advice on how to organize and plan the tasks.'),
+  advice: z.string().describe('Advice on how to organize and plan the tasks, formatted with markdown.'),
 });
 
 export type TaskAdviceOutput = z.infer<typeof TaskAdviceOutputSchema>;
@@ -40,7 +40,21 @@ const taskAdvicePrompt = ai.definePrompt({
   name: 'taskAdvicePrompt',
   input: {schema: TaskAdviceInputSchema},
   output: {schema: TaskAdviceOutputSchema},
-  prompt: `You are a task management expert. Analyze the following list of tasks and provide advice on how to organize and plan them effectively. Consider due dates, urgency levels, required hours, and tags when providing your advice. Be concise and actionable.
+  prompt: `You are a task management expert. Analyze the following list of tasks and provide a clear, actionable plan. 
+
+Your response MUST be formatted using Markdown. Use headings, bullet points, and bold text to make the advice easy to read and follow.
+
+Start with a summary, then provide a step-by-step plan. For example:
+
+### Quick Summary
+You have X tasks to complete. Let's focus on the most urgent ones first.
+
+### Action Plan
+*   **Today's Focus:**
+    *   Task A (High Urgency)
+    *   Task B (Due Soon)
+*   **Up Next:**
+    *   Task C
 
 Tasks:
 {{#each tasks}}
