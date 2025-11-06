@@ -170,21 +170,6 @@ export function CalendarView() {
                 components={{ 
                     DayContent, 
                     Caption: CustomCaption,
-                    Day: (props: DayProps) => {
-                      const dayIndex = props.date.getDate() + props.date.getMonth() * 31;
-                      const isOutside = isSameMonth(props.date, props.displayMonth);
-                      return (
-                        <div
-                          className='day-animated'
-                          style={{
-                            animationDelay: `${dayIndex * 10}ms`,
-                            animationFillMode: 'forwards',
-                          }}
-                        >
-                            <DayPicker.defaultProps.components.Day {...props} />
-                        </div>
-                      )
-                    }
                 }}
                 showOutsideDays
                 onDayClick={handleDayClick}
@@ -194,6 +179,11 @@ export function CalendarView() {
                     month: 'flex flex-col flex-1 w-full h-full',
                     table: 'w-full h-full table-fixed border-collapse border-spacing-1',
                     row: 'w-full',
+                    day: 'day-animated',
+                }}
+                day={(props: DayProps) => {
+                  const dayIndex = props.date.getDate() + props.date.getMonth() * 31;
+                  return <div style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'forwards' }} />;
                 }}
             />
 
