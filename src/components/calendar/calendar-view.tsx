@@ -18,9 +18,9 @@ function DayContent(props: DayContentProps) {
     const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(undefined);
     
     return (
-        <div className="relative flex flex-col h-full w-full p-1">
-            <p className='text-xs self-start'>{props.date.getDate()}</p>
-            <div className='flex-1 overflow-y-auto space-y-1 mt-1'>
+        <div className="relative h-full w-full p-1">
+            <p className='absolute top-1 left-1 text-xs'>{props.date.getDate()}</p>
+            <div className='mt-5 flex-1 overflow-y-auto space-y-1 h-[calc(100%-1.25rem)]'>
                 {tasksForDay.map(task => (
                     <div 
                         key={task.id}
@@ -81,7 +81,6 @@ export function CalendarView() {
 
     useEffect(() => {
         setIsClient(true);
-        // Increment key to re-trigger animation when component is shown
         setAnimationKey(prev => prev + 1);
     }, []);
 
@@ -180,10 +179,6 @@ export function CalendarView() {
                     table: 'w-full h-full table-fixed border-collapse border-spacing-1',
                     row: 'w-full',
                     day: 'day-animated',
-                }}
-                day={(props: DayProps) => {
-                  const dayIndex = props.date.getDate() + props.date.getMonth() * 31;
-                  return <div style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'forwards' }} />;
                 }}
             />
 
