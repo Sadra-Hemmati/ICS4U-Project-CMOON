@@ -107,16 +107,16 @@ export function CalendarView() {
                     caption_label: "text-lg font-medium",
                     day: "animate-in fade-in-0",
                 }}
-                day={(dayProps) => {
-                    const dayIndex = dayProps.date.getDate() + dayProps.date.getMonth() * 31;
-                     return (
-                        <div style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'both' }}>
-                           <DayPicker.defaultProps.components!.day {...dayProps} />
-                        </div>
-                     )
-                }}
                 components={{
-                    DayContent
+                    DayContent,
+                    day: (dayProps) => {
+                        const dayIndex = dayProps.date.getDate() + dayProps.date.getMonth() * 31;
+                        return (
+                           <div style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'both' }}>
+                              <DayPicker.defaultProps.components!.day {...dayProps} />
+                           </div>
+                        )
+                   },
                 }}
                 showOutsideDays
                 onDayClick={handleDayClick}
