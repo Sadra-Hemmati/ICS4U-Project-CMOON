@@ -1,3 +1,5 @@
+import { ActionPlan } from "./schemas/task-analyzer-schemas";
+
 export type Urgency = "low" | "medium" | "high";
 
 export interface Tag {
@@ -15,3 +17,10 @@ export interface Task {
   tags: string[]; // array of tag ids
   completed: boolean;
 }
+
+export type ChatMessage = {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  actionPlan?: ActionPlan;
+};

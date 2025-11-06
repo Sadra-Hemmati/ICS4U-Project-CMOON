@@ -6,36 +6,64 @@
 
 import { z } from 'genkit';
 
-export const TaskSchema = z.object({
-  id: z.string().describe('The unique identifier of the task.'),
-  name: z.string().describe('The name of the task.'),
-  tags: z
-    .array(z.string())
-    .describe('A list of tag names associated with the task.'),
-});
-
-export const TagSchema = z.object({
-  id: z.string().describe('The unique ID of the tag.'),
-  name: z.string().describe('The name of the tag.'),
-});
-
+// Input schema for the main analysis flow
 export const AnalyzeRequestInputSchema = z.object({
   request: z.string().describe("The user's raw text request."),
-  tasks: z.array(TaskSchema).describe('The current list of tasks.'),
-  tags: z.array(TagSchema).describe('The available tags.'),
+  tasks: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    dueDate: z.string(),
+    urgency: z.string().optional(),
+    tags: z.array(z.string())
+  })).describe('The current list of tasks.'),
+  tags: z.array(z.object({
+    id: z.string(),
+    name: z.string()
+  })).describe('The available tags.'),
 });
 
+
+// Schemas for operations within an action plan
+const CreateOperationSchema = z.object({
+  type: z.string().describe("Must be 'create'"),
+  tasks: z.array(z.object({
+    name: z.string(),
+    dueDate: z.string().optional(),
+    urgency: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+  })),
+});
+
+const UpdateOperationSchema = z.object({
+  type: z.string().describe("Must be 'update'"),
+  tasks: z.array(z.object({
+    id: z.string(),
+    updates: z.object({
+      name: z.string().optional(),
+      dueDate: z.string().optional(),
+      urgency: z.string().optional(),
+      tags: z.array(z.string()).optional(),
+    }),
+  })),
+});
+
+const DeleteOperationSchema = z.object({
+  type: z.string().describe("Must be 'delete'"),
+  tasks: z.array(z.object({ id: z.string(), name: z.string() })),
+});
+
+const OperationSchema = z.union([
+  CreateOperationSchema,
+  UpdateOperationSchema,
+  DeleteOperationSchema,
+]);
+
+
+// Schemas for the top-level response from the analyzer
 export const ActionPlanSchema = z.object({
-  messageId: z
-    .string()
-    .describe('The ID of the message that this plan is associated with.'),
+  messageId: z.string().describe('The ID of the message that this plan is associated with.'),
   type: z.string().describe("Must be the string 'action'."),
-  action: z
-    .string()
-    .describe("The type of action to perform. Currently, only 'delete' is supported."),
-  tasks: z
-    .array(TaskSchema)
-    .describe('The tasks that will be affected by the action.'),
+  operations: z.array(OperationSchema).describe('The sequence of operations to perform.'),
   confirmationMessage: z
     .string()
     .describe(

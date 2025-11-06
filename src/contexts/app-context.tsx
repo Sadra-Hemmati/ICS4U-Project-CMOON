@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useState, ReactNode, useCallback } from 'react';
-import { Task, Tag, Urgency } from '@/lib/types';
+import { Task, Tag, Urgency, ChatMessage } from '@/lib/types';
 import { initialTasks, initialTags } from '@/lib/data';
 import { stringToColor } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,6 +9,8 @@ import { v4 as uuidv4 } from 'uuid';
 export interface AppContextType {
   tasks: Task[];
   tags: Tag[];
+  messages: ChatMessage[];
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
   addTask: (task: Omit<Task, 'id' | 'completed'>) => void;
   addTasks: (tasks: Omit<Task, 'id' | 'completed'>[]) => void;
   updateTask: (id: string, updates: Partial<Omit<Task, 'id'>>) => void;
@@ -24,6 +26,9 @@ export const AppContext = createContext<AppContextType | null>(null);
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [tags, setTags] = useState<Tag[]>(initialTags);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { id: '1', role: 'assistant', content: "Welcome to the TaskZen chatbot! You can ask me to perform actions like 'delete all tasks with the personal tag', paste a list of tasks to add them, or ask for advice." }
+  ]);
 
   const getTagById = useCallback((id: string) => tags.find(t => t.id === id), [tags]);
 
@@ -89,6 +94,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     tasks,
     tags,
+    messages,
+    setMessages,
     addTask,
     addTasks,
     updateTask,

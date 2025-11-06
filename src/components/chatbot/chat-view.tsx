@@ -12,20 +12,20 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '../ui/card';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../ui/scroll-area';
-
-type Message = {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  actionPlan?: ActionPlan;
-};
+import { ChatMessage } from '@/lib/types';
 
 export function ChatView() {
-  const { tasks, tags, addTasks, findOrCreateTags, deleteTasks } = useApp();
+  const {
+    tasks,
+    tags,
+    addTasks,
+    findOrCreateTags,
+    deleteTasks,
+    updateTask,
+    messages,
+    setMessages,
+  } = useApp();
   const { toast } = useToast();
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', role: 'assistant', content: "Welcome to the TaskZen chatbot! You can ask me to perform actions like 'delete all tasks with the personal tag', paste a list of tasks to add them, or ask for advice." }
-  ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -43,7 +43,7 @@ export function ChatView() {
   const handleSubmit = async () => {
     if (!input.trim()) return;
     setIsLoading(true);
-    const userMessage: Message = { id: Date.now().toString(), role: 'user', content: input };
+    const userMessage: ChatMessage = { id: Date.now().toString(), role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     const currentInput = input;
     setInput('');
@@ -53,13 +53,15 @@ export function ChatView() {
       const allTasks = tasks.map(t => ({
         id: t.id,
         name: t.name,
+        dueDate: t.dueDate.toISOString(),
+        urgency: t.urgency,
         tags: t.tags.map(tagId => allTags.find(t => t.id === tagId)?.name).filter((t): t is string => !!t)
       }));
 
       const result = await analyzeTaskRequest({ request: currentInput, tasks: allTasks, tags: allTags });
       
       if (result.type === 'action') {
-        const assistantMessage: Message = {
+        const assistantMessage: ChatMessage = {
             id: result.messageId,
             role: 'assistant',
             content: result.confirmationMessage,
@@ -69,13 +71,13 @@ export function ChatView() {
       } else if (result.type === 'parse') {
         handleParseTasks(currentInput);
       } else {
-         const assistantMessage: Message = { id: Date.now().toString() + 'a', role: 'assistant', content: result.textResponse };
+         const assistantMessage: ChatMessage = { id: Date.now().toString() + 'a', role: 'assistant', content: result.textResponse };
          setMessages(prev => [...prev, assistantMessage]);
       }
 
     } catch (error) {
       console.error('Chatbot request failed:', error);
-      const assistantMessage: Message = { id: Date.now().toString() + 'e', role: 'assistant', content: "Sorry, I had trouble understanding that. Please try again." };
+      const assistantMessage: ChatMessage = { id: Date.now().toString() + 'e', role: 'assistant', content: "Sorry, I had trouble understanding that. Please try again." };
       setMessages(prev => [...prev, assistantMessage]);
     } finally {
       setIsLoading(false);
@@ -83,28 +85,54 @@ export function ChatView() {
   };
   
   const handleExecuteAction = (plan: ActionPlan) => {
-    if (plan.action === 'delete') {
-      const taskIdsToDelete = plan.tasks.map(t => t.id);
-      deleteTasks(taskIdsToDelete);
+    let description = '';
 
-      const assistantMessage: Message = {
-        id: Date.now().toString() + 'a',
-        role: 'assistant',
-        content: `I've deleted ${taskIdsToDelete.length} tasks as you requested.`,
-      };
-      setMessages(prev => [...prev, assistantMessage]);
+    plan.operations.forEach(op => {
+      if (op.type === 'delete') {
+        const taskIdsToDelete = op.tasks.map(t => t.id);
+        deleteTasks(taskIdsToDelete);
+        description += `Deleted ${taskIdsToDelete.length} tasks. `;
+      } else if (op.type === 'create') {
+        const newTasks = op.tasks.map(task => ({
+          ...task,
+          dueDate: new Date(task.dueDate!),
+          tags: findOrCreateTags(task.tags || []),
+        }));
+        addTasks(newTasks);
+        description += `Created ${newTasks.length} new task(s). `;
+      } else if (op.type === 'update') {
+        op.tasks.forEach(task => {
+          const updates: any = { ...task.updates };
+          if (task.updates.tags) {
+            updates.tags = findOrCreateTags(task.updates.tags);
+          }
+          if (task.updates.dueDate) {
+            updates.dueDate = new Date(task.updates.dueDate);
+          }
+          updateTask(task.id, updates);
+        });
+        description += `Updated ${op.tasks.length} task(s). `;
+      }
+    });
 
-      toast({
-        title: 'Tasks Deleted',
-        description: `Successfully deleted ${taskIdsToDelete.length} tasks.`,
-      });
-    }
+    const assistantMessage: ChatMessage = {
+      id: Date.now().toString() + 'a',
+      role: 'assistant',
+      content: `I've completed the requested actions.`,
+    };
+    setMessages(prev => [...prev, assistantMessage]);
+
+    toast({
+      title: 'Action Completed',
+      description: description.trim(),
+    });
+
     // Remove the action plan from the message so the confirmation buttons disappear
     setMessages(prev => prev.map(m => m.id === plan.messageId ? { ...m, actionPlan: undefined } : m));
   };
   
   const handleCancelAction = (messageId: string) => {
-    const assistantMessage: Message = {
+    const assistantMessage: ChatMessage = {
         id: Date.now().toString() + 'a',
         role: 'assistant',
         content: `OK, I've cancelled the operation.`,
@@ -112,7 +140,6 @@ export function ChatView() {
     setMessages(prev => [...prev, assistantMessage]);
     setMessages(prev => prev.map(m => m.id === messageId ? { ...m, actionPlan: undefined } : m));
   }
-
 
   const handleParseTasks = async (textToParse: string) => {
     try {
@@ -125,7 +152,7 @@ export function ChatView() {
           tags: findOrCreateTags(task.tags || []),
         }));
         addTasks(newTasks);
-        const assistantMessage: Message = { id: Date.now().toString() + 'a', role: 'assistant', content: `Successfully parsed and added ${parsedTasks.length} tasks to your list!` };
+        const assistantMessage: ChatMessage = { id: Date.now().toString() + 'a', role: 'assistant', content: `Successfully parsed and added ${parsedTasks.length} tasks to your list!` };
         setMessages(prev => [...prev, assistantMessage]);
         toast({ title: 'Tasks Added', description: `Added ${parsedTasks.length} new tasks.` });
       } else {
@@ -133,14 +160,14 @@ export function ChatView() {
       }
     } catch (error) {
       console.error('Task parsing failed:', error);
-      const assistantMessage: Message = { id: Date.now().toString() + 'e', role: 'assistant', content: "Sorry, I couldn't parse any tasks from that text. Please try formatting it clearly, for example: 'Design mockups due 2024-12-25, 8 hours, tag: design'." };
+      const assistantMessage: ChatMessage = { id: Date.now().toString() + 'e', role: 'assistant', content: "Sorry, I couldn't parse any tasks from that text. Please try formatting it clearly, for example: 'Design mockups due 2024-12-25, 8 hours, tag: design'." };
       setMessages(prev => [...prev, assistantMessage]);
     }
   };
 
   const handleGetAdvice = async () => {
     setIsLoading(true);
-    const userMessage: Message = { id: Date.now().toString(), role: 'user', content: 'Give me advice on my tasks.' };
+    const userMessage: ChatMessage = { id: Date.now().toString(), role: 'user', content: 'Give me advice on my tasks.' };
     setMessages(prev => [...prev, userMessage]);
 
     try {
@@ -155,18 +182,18 @@ export function ChatView() {
         }));
       
       if (nonCompletedTasks.length === 0) {
-         const assistantMessage: Message = { id: Date.now().toString() + 'a', role: 'assistant', content: "You have no pending tasks, so you're all clear! Keep up the great work." };
+         const assistantMessage: ChatMessage = { id: Date.now().toString() + 'a', role: 'assistant', content: "You have no pending tasks, so you're all clear! Keep up the great work." };
          setMessages(prev => [...prev, assistantMessage]);
          setIsLoading(false);
          return;
       }
 
       const result = await getTaskAdvice({ tasks: nonCompletedTasks });
-      const assistantMessage: Message = { id: Date.now().toString() + 'a', role: 'assistant', content: result.advice };
+      const assistantMessage: ChatMessage = { id: Date.now().toString() + 'a', role: 'assistant', content: result.advice };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Getting advice failed:', error);
-      const assistantMessage: Message = { id: Date.now().toString() + 'e', role: 'assistant', content: "Sorry, I couldn't generate advice right now. Please try again later." };
+      const assistantMessage: ChatMessage = { id: Date.now().toString() + 'e', role: 'assistant', content: "Sorry, I couldn't generate advice right now. Please try again later." };
       setMessages(prev => [...prev, assistantMessage]);
     } finally {
       setIsLoading(false);
