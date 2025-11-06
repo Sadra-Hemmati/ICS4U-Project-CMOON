@@ -62,11 +62,16 @@ export async function panicModeScheduleAnalysis(
 
   const { output } = await panicModeScheduleAnalysisFlow(input);
 
-  if (!output?.actionPlan) {
+  if (!output?.actionPlan || output.actionPlan.length === 0) {
     // This is a fallback in case the AI model fails to return a structured response.
+    const sortedTasks = [...input.tasks].sort((a,b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
     return {
       summary,
-      actionPlan: [{ title: 'Analysis Error', description: "I couldn't generate a clear plan right now. Try focusing on your most urgent tasks.", tasks: [] }]
+      actionPlan: [{ 
+        title: 'Your Priority List', 
+        description: "I've sorted your tasks by the nearest due date to help you get started.", 
+        tasks: sortedTasks.slice(0,5).map(t => ({id: t.id, name: t.name, requiredHours: t.requiredHours, priority: t.urgency}))
+      }]
     };
   }
 
