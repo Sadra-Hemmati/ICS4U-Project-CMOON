@@ -71,6 +71,13 @@ export function CalendarView() {
                     width: 120px;
                     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
                     border-radius: var(--radius);
+                    animation: fadeIn 0.5s ease-out forwards;
+                    opacity: 0;
+                }
+                @keyframes fadeIn {
+                    to {
+                        opacity: 1;
+                    }
                 }
                 .rdp-day:hover {
                     background-color: hsl(var(--accent) / 0.5);
@@ -98,6 +105,15 @@ export function CalendarView() {
                     table: 'w-full border-collapse',
                     row: 'w-full',
                     caption_label: "text-lg font-medium",
+                    day: "animate-in fade-in-0",
+                }}
+                day={(dayProps) => {
+                    const dayIndex = dayProps.date.getDate() + dayProps.date.getMonth() * 31;
+                     return (
+                        <div style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'both' }}>
+                           <DayPicker.defaultProps.components!.day {...dayProps} />
+                        </div>
+                     )
                 }}
                 components={{
                     DayContent

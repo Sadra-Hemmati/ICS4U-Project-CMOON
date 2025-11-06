@@ -139,7 +139,7 @@ export function TasksBoard() {
                 key={task.id}
                 onClick={() => setTaskToEdit(task)}
                 className="cursor-pointer animate-in fade-in-0"
-                style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
+                style={{ animationDelay: `${index * 25}ms`, animationFillMode: 'both' }}
                 data-state={task.completed ? 'completed' : ''}
               >
                 <TableCell>
