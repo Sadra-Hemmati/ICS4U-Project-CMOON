@@ -6,7 +6,6 @@ import { isSameDay, isSameMonth } from 'date-fns';
 import { useApp } from '@/hooks/use-app';
 import { Task } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { TaskFormSheet } from '../tasks/task-form-sheet';
 import { Skeleton } from '../ui/skeleton';
 
