@@ -57,15 +57,38 @@ export function CalendarView() {
     };
     
     if (!isClient) {
-        return <Skeleton className="w-full h-[700px]" />;
+        return <Skeleton className="w-full h-full" />;
     }
 
     return (
         <>
             <style>{`
+                .rdp {
+                    width: 100%;
+                    height: 100%;
+                }
+                .rdp-months {
+                    height: 100%;
+                }
+                .rdp-month {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                }
+                .rdp-table {
+                    flex-grow: 1;
+                    border-collapse: separate;
+                    border-spacing: 4px;
+                }
+                 .rdp-tbody {
+                    height: 100%;
+                }
+                .rdp-row {
+                    height: calc(100% / 6); /* Adjust based on number of weeks shown */
+                }
                 .rdp-day {
-                    height: 120px;
-                    width: 120px;
+                    height: 100%;
+                    width: 100%;
                     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
                     border-radius: var(--radius);
                 }
@@ -80,10 +103,6 @@ export function CalendarView() {
                 }
                 .rdp-day:hover {
                     background-color: hsl(var(--accent) / 0.5);
-                }
-                .rdp-table {
-                    border-collapse: separate;
-                    border-spacing: 4px;
                 }
                 .rdp-day, .rdp-head_cell {
                     border: 1px solid hsl(var(--border));
@@ -100,7 +119,7 @@ export function CalendarView() {
                 components={{
                     DayContent,
                 }}
-                className="w-full"
+                className="w-full h-full flex-1"
                 classNames={{
                     months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full',
                     month: 'space-y-4 w-full',
