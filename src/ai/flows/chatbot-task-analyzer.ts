@@ -75,8 +75,8 @@ You have three choices for the action type:
 
 1.  **action**: Use this when the user explicitly asks to perform an operation on their tasks, like deleting, updating, or creating. Your job is to form a clear plan.
     - For 'delete' actions, you MUST identify the tasks to be deleted based on the user's criteria (e.g., by tag).
-    - You MUST generate a `confirmationMessage` that clearly explains what you are about to do and which tasks will be affected. For example: "I will delete 3 tasks with the 'personal' tag: 'Book dentist appointment', 'Call mom', and 'Buy groceries'. Do you want to proceed?".
-    - You MUST populate the `tasks` array with the full details of the tasks that will be deleted.
+    - You MUST generate a \`confirmationMessage\` that clearly explains what you are about to do and which tasks will be affected. For example: "I will delete 3 tasks with the 'personal' tag: 'Book dentist appointment', 'Call mom', and 'Buy groceries'. Do you want to proceed?".
+    - You MUST populate the \`tasks\` array with the full details of the tasks that will be deleted.
 
 2.  **parse**: Use this when the user provides a block of text that looks like a list of tasks to be added to their list. The text doesn't explicitly say "add these tasks", but the format implies it. The next step in the application will be to parse this text.
 
