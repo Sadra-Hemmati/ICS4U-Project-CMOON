@@ -68,6 +68,8 @@ export function CalendarView() {
                     width: 120px;
                     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
                     border-radius: var(--radius);
+                }
+                .rdp-day:not([data-outside="true"]) {
                     animation: fadeIn 0.5s ease-out forwards;
                     opacity: 0;
                 }
@@ -97,12 +99,6 @@ export function CalendarView() {
             <DayPicker
                 components={{
                     DayContent,
-                    Day: (dayProps) => {
-                        const dayIndex = dayProps.date.getDate() + dayProps.date.getMonth() * 31;
-                        const Day = DayPicker.defaultProps.components?.Day ?? 'div';
-                        // @ts-ignore
-                        return <Day {...dayProps} style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'both' }} />;
-                    },  
                 }}
                 className="w-full"
                 classNames={{
