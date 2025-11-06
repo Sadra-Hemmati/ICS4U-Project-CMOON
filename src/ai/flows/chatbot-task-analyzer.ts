@@ -7,67 +7,38 @@
  *
  * It includes:
  * - `analyzeTaskRequest`: The main function that orchestrates the analysis.
- * - `ActionPlan`: The Zod schema and type for a structured action plan.
- * - `AnalysisResponse`: The Zod schema and type for the overall response.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import {
+  ActionPlanSchema,
+  AnalysisResponse,
+  AnalysisResponseSchema,
+  AnalyzeRequestInputSchema,
+  TaskSchema,
+  TagSchema,
+} from '@/ai/schemas/task-analyzer-schemas';
 
-const TaskSchema = z.object({
-  id: z.string().describe('The unique identifier of the task.'),
-  name: z.string().describe('The name of the task.'),
-  tags: z.array(z.string()).describe('A list of tag names associated with the task.'),
-});
-
-const TagSchema = z.object({
-    id: z.string().describe('The unique ID of the tag.'),
-    name: z.string().describe('The name of the tag.'),
-});
-
-const AnalyzeRequestInputSchema = z.object({
-  request: z.string().describe("The user's raw text request."),
-  tasks: z.array(TaskSchema).describe('The current list of tasks.'),
-  tags: z.array(TagSchema).describe('The available tags.'),
-});
-
-export const ActionPlanSchema = z.object({
-  messageId: z.string().describe("The ID of the message that this plan is associated with."),
-  type: z.literal('action'),
-  action: z.literal('delete').describe("The type of action to perform."),
-  tasks: z.array(TaskSchema).describe('The tasks that will be affected by the action.'),
-  confirmationMessage: z.string().describe('A user-friendly message explaining what the action will do and asking for confirmation.'),
-});
-export type ActionPlan = z.infer<typeof ActionPlanSchema>;
-
-const ParsePlanSchema = z.object({
-  type: z.literal('parse'),
-  reasoning: z.string().describe('Explanation of why the model chose to parse the text.'),
-});
-
-const TextResponseSchema = z.object({
-  type: z.literal('response'),
-  textResponse: z.string().describe('A simple text response when no specific action is needed.'),
-});
-
-export const AnalysisResponseSchema = z.union([ActionPlanSchema, ParsePlanSchema, TextResponseSchema]);
-export type AnalysisResponse = z.infer<typeof AnalysisResponseSchema>;
-
+export type {
+  ActionPlan,
+  AnalysisResponse,
+} from '@/ai/schemas/task-analyzer-schemas';
 
 export async function analyzeTaskRequest(
   input: z.infer<typeof AnalyzeRequestInputSchema>
 ): Promise<AnalysisResponse> {
-    const messageId = Date.now().toString() + 'p';
-    const result = await analyzeTaskRequestFlow({...input, messageId});
-    if (result.type === 'action') {
-        result.messageId = messageId;
-    }
-    return result;
+  const messageId = Date.now().toString() + 'p';
+  const result = await analyzeTaskRequestFlow({ ...input, messageId });
+  if (result.type === 'action') {
+    result.messageId = messageId;
+  }
+  return result;
 }
 
 const analysisPrompt = ai.definePrompt({
   name: 'analyzeTaskRequestPrompt',
-  input: { schema: AnalyzeRequestInputSchema.extend({messageId: z.string()}) },
+  input: { schema: AnalyzeRequestInputSchema.extend({ messageId: z.string() }) },
   output: { schema: AnalysisResponseSchema },
   prompt: `You are an intelligent task management assistant. Your primary job is to analyze a user's request and determine the correct course of action.
 
@@ -108,11 +79,10 @@ Here is the user's request and current data:
 Analyze the request and provide the appropriate JSON output based on the schemas. Set the messageId to "{{messageId}}".`,
 });
 
-
 const analyzeTaskRequestFlow = ai.defineFlow(
   {
     name: 'analyzeTaskRequestFlow',
-    inputSchema: AnalyzeRequestInputSchema.extend({messageId: z.string()}),
+    inputSchema: AnalyzeRequestInputSchema.extend({ messageId: z.string() }),
     outputSchema: AnalysisResponseSchema,
   },
   async (input) => {

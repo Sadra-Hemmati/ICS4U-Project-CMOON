@@ -60,7 +60,7 @@ export function ChatView() {
       
       if (result.type === 'action') {
         const assistantMessage: Message = {
-            id: Date.now().toString() + 'a',
+            id: result.messageId,
             role: 'assistant',
             content: result.confirmationMessage,
             actionPlan: result
