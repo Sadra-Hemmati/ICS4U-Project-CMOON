@@ -26,7 +26,7 @@ function DayContent(props: DayContentProps) {
                         key={task.id}
                         onClick={(e) => { e.stopPropagation(); setTaskToEdit(task); }}
                         className={cn(
-                            "text-xs rounded-sm px-1 truncate cursor-pointer hover:opacity-80",
+                            "text-sm rounded-sm px-1 cursor-pointer hover:opacity-80 line-clamp-2",
                             task.completed ? 'line-through bg-green-900/50' : 'bg-primary/20'
                         )}
                     >
