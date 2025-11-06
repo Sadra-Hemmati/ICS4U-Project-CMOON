@@ -96,7 +96,7 @@ export function CalendarView() {
     }
 
     return (
-        <>
+        <div className='w-full h-full flex flex-col'>
             <style>{`
                 .rdp {
                     width: 100%;
@@ -118,6 +118,7 @@ export function CalendarView() {
                     width: 100%;
                     border-collapse: separate;
                     border-spacing: 4px;
+                    table-layout: fixed;
                 }
                  .rdp-tbody {
                     height: 100%;
@@ -175,7 +176,7 @@ export function CalendarView() {
                 }}
                 showOutsideDays
                 onDayClick={handleDayClick}
-                className="w-full h-full flex flex-col"
+                className="w-full flex flex-col flex-1"
                 classNames={{
                     months: 'flex flex-col flex-1 w-full h-full',
                     month: 'flex flex-col flex-1 w-full h-full',
@@ -190,6 +191,6 @@ export function CalendarView() {
                 onOpenChange={setIsFormOpen}
                 defaultDate={selectedDate}
             />
-        </>
+        </div>
     );
 }

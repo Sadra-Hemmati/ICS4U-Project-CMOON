@@ -9,7 +9,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <ParticleBackground />
       <div className="flex-1 flex flex-col z-10">
         <AppHeader />
-        <main className="flex-1 pb-20">{children}</main>
+        <main className="flex-1 flex flex-col pb-20">{children}</main>
       </div>
       <BottomNav />
     </div>
