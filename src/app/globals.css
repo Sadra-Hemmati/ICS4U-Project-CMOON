@@ -66,3 +66,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .particle-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    background-color: hsl(var(--primary) / 0.1);
+    border-radius: 50%;
+    opacity: 0;
+    animation: rise 10s infinite linear;
+  }
+
+  @keyframes rise {
+    0% {
+      transform: translateY(100vh) scale(0.5);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-10vh) scale(1);
+      opacity: 0;
+    }
+  }
+}
