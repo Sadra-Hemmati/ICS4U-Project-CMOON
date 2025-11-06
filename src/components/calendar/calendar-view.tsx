@@ -119,7 +119,6 @@ export function CalendarView() {
                     border-collapse: separate;
                     border-spacing: 4px;
                     table-layout: fixed;
-                    height: 100%;
                 }
                  .rdp-tbody {
                     height: 100%;
