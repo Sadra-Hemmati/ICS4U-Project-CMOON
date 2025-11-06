@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DayPicker, DayProps } from 'react-day-picker';
-import { isSameDay, isSameMonth } from 'date-fns';
+import { DayPicker, DayProps, CaptionProps, useNavigation } from 'react-day-picker';
+import { isSameDay, isSameMonth, format } from 'date-fns';
 import { useApp } from '@/hooks/use-app';
 import { Task } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { TaskFormSheet } from '../tasks/task-form-sheet';
 import { Skeleton } from '../ui/skeleton';
+import { Button } from '../ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 function DayContent(props: DayProps) {
     const { tasks } = useApp();
@@ -16,8 +18,13 @@ function DayContent(props: DayProps) {
     
     const isCurrentMonth = isSameMonth(props.date, props.displayMonth);
 
+    const dayIndex = props.date.getDate() + props.date.getMonth() * 31;
+
     return (
-        <div className={cn("relative flex flex-col h-full w-full p-1", !isCurrentMonth && "opacity-50")}>
+        <div 
+            className={cn("relative flex flex-col h-full w-full p-1", !isCurrentMonth && "opacity-50")}
+            style={{ animationDelay: `${dayIndex * 10}ms`, animationFillMode: 'both' }}
+            >
             <p className='text-xs self-start'>{props.date.getDate()}</p>
             <div className='flex-1 overflow-y-auto space-y-1 mt-1'>
                 {tasksForDay.map(task => (
@@ -41,6 +48,36 @@ function DayContent(props: DayProps) {
         </div>
     )
 }
+
+function CustomCaption(props: CaptionProps) {
+  const { goToMonth, nextMonth, previousMonth } = useNavigation();
+  return (
+    <div className="flex items-center justify-between p-2">
+       <h2 className="text-xl font-bold text-foreground">
+        {format(props.displayMonth, 'MMMM yyyy')}
+      </h2>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          disabled={!previousMonth}
+          onClick={() => previousMonth && goToMonth(previousMonth)}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          disabled={!nextMonth}
+          onClick={() => nextMonth && goToMonth(nextMonth)}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 
 export function CalendarView() {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -66,6 +103,7 @@ export function CalendarView() {
                 .rdp {
                     width: 100%;
                     height: 100%;
+                    margin: 0;
                 }
                 .rdp-months {
                     height: 100%;
@@ -118,23 +156,29 @@ export function CalendarView() {
                     height: 40px;
                     vertical-align: middle;
                 }
+                 .rdp-caption_label {
+                    font-size: 1.5rem; /* Increased font size */
+                    font-weight: 600;
+                }
+                .rdp-caption {
+                    margin-bottom: 1rem; /* Increased margin */
+                    padding: 0 0.5rem;
+                }
             `}</style>
             <DayPicker
-                components={{
-                    DayContent,
-                }}
-                className="w-full h-full flex-1"
-                classNames={{
-                    months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full',
-                    month: 'space-y-4 w-full',
-                    table: 'w-full border-collapse',
-                    row: 'w-full',
-                    caption_label: "text-lg font-medium",
-                    day: "animate-in fade-in-0",
-                }}
+                components={{ DayContent, Caption: CustomCaption }}
                 showOutsideDays
                 onDayClick={handleDayClick}
+                className="w-full h-full flex flex-col"
+                classNames={{
+                    months: 'flex flex-col flex-1 w-full h-full',
+                    month: 'flex flex-col flex-1 w-full h-full',
+                    table: 'w-full h-full table-fixed border-collapse border-spacing-1',
+                    row: 'w-full',
+                    day: 'w-full h-full',
+                }}
             />
+
             <TaskFormSheet 
                 open={isFormOpen}
                 onOpenChange={setIsFormOpen}
