@@ -1,0 +1,96 @@
+'use client';
+
+import { useState } from 'react';
+import { DayPicker, DayProps } from 'react-day-picker';
+import { isSameDay, isSameMonth } from 'date-fns';
+import { useApp } from '@/hooks/use-app';
+import { Task } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { TaskFormSheet } from '../tasks/task-form-sheet';
+
+function DayContent(props: DayProps) {
+    const { tasks } = useApp();
+    const tasksForDay = tasks.filter(task => isSameDay(task.dueDate, props.date));
+    const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(undefined);
+    
+    const isCurrentMonth = isSameMonth(props.date, props.displayMonth);
+
+    return (
+        <div className={cn("relative flex flex-col h-full w-full p-1", !isCurrentMonth && "opacity-50")}>
+            <p className='text-xs self-start'>{props.date.getDate()}</p>
+            <div className='flex-1 overflow-y-auto space-y-1 mt-1'>
+                {tasksForDay.map(task => (
+                    <div 
+                        key={task.id}
+                        onClick={(e) => { e.stopPropagation(); setTaskToEdit(task); }}
+                        className={cn(
+                            "text-xs rounded-sm px-1 truncate cursor-pointer hover:opacity-80",
+                            task.completed ? 'line-through bg-green-900/50' : 'bg-primary/20'
+                        )}
+                    >
+                       {task.name}
+                    </div>
+                ))}
+            </div>
+             <TaskFormSheet
+                open={!!taskToEdit}
+                onOpenChange={(isOpen) => !isOpen && setTaskToEdit(undefined)}
+                task={taskToEdit}
+              />
+        </div>
+    )
+}
+
+export function CalendarView() {
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+    const [isFormOpen, setIsFormOpen] = useState(false);
+
+    const handleDayClick = (day: Date) => {
+        setSelectedDate(day);
+        setIsFormOpen(true);
+    };
+
+    return (
+        <>
+            <style>{`
+                .rdp-day {
+                    height: 120px;
+                    width: 120px;
+                }
+                .rdp-table {
+                    border-collapse: collapse;
+                }
+                .rdp-day, .rdp-head_cell {
+                    border: 1px solid hsl(var(--border));
+                    vertical-align: top;
+                }
+                .rdp-head_cell {
+                    text-align: center;
+                    height: 40px;
+                    vertical-align: middle;
+                }
+            `}</style>
+            <DayPicker
+                className="w-full"
+                classNames={{
+                    months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full',
+                    month: 'space-y-4 w-full',
+                    table: 'w-full border-collapse',
+                    row: 'w-full',
+                    caption_label: "text-lg font-medium",
+                }}
+                components={{
+                    DayContent
+                }}
+                showOutsideDays
+                onDayClick={handleDayClick}
+            />
+            <TaskFormSheet 
+                open={isFormOpen}
+                onOpenChange={setIsFormOpen}
+                defaultDate={selectedDate}
+            />
+        </>
+    );
+}
