@@ -55,6 +55,7 @@ export function ChatView() {
         name: t.name,
         dueDate: t.dueDate.toISOString(),
         urgency: t.urgency,
+        completed: t.completed,
         tags: t.tags.map(tagId => allTags.find(t => t.id === tagId)?.name).filter((t): t is string => !!t)
       }));
 
@@ -280,7 +281,7 @@ export function ChatView() {
       </div>
        <div className='flex justify-between items-center mt-2'>
          <p className='text-xs text-muted-foreground'>
-            You can also ask for advice or perform actions. Try "delete all tasks with personal tag".
+            You can also ask to mark tasks as done, e.g. "Mark 'Book dentist appointment' as done".
           </p>
         <Button onClick={handleGetAdvice} disabled={isLoading}>
             <Sparkles className="mr-2 h-4 w-4" />

@@ -14,7 +14,8 @@ export const AnalyzeRequestInputSchema = z.object({
     name: z.string(),
     dueDate: z.string(),
     urgency: z.string().optional(),
-    tags: z.array(z.string())
+    tags: z.array(z.string()),
+    completed: z.boolean(),
   })).describe('The current list of tasks.'),
   tags: z.array(z.object({
     id: z.string(),
@@ -43,6 +44,7 @@ const UpdateOperationSchema = z.object({
       dueDate: z.string().optional(),
       urgency: z.string().optional(),
       tags: z.array(z.string()).optional(),
+      completed: z.boolean().optional(),
     }),
   })),
 });

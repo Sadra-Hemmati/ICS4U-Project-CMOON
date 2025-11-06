@@ -45,9 +45,9 @@ You have three choices for the 'type' field in your output:
 1.  **'action'**: Use this when the user explicitly asks to perform an operation on their tasks. Your job is to form a clear, step-by-step plan.
     - **Actions Supported**: 'create', 'update', 'delete'.
     - For **'create'** actions, parse the user's request to define a new task. You must infer the 'name', 'dueDate', 'urgency', and 'tags'. Today's date is {{currentDate}}. If a due date is relative (e.g., "tomorrow"), calculate the absolute date.
-    - For **'update'** actions, identify the task(s) to be updated by name or other criteria. Determine which fields to change (e.g., 'dueDate', 'urgency', 'tags'). Include only the changed fields in the 'updates' object. To add or remove tags, use the 'tags' field with the final list of tags for the task.
-    - For **'delete'** actions, identify the task(s) to be deleted based on the user's criteria (e.g., by name or tag).
-    - You MUST generate a \`confirmationMessage\` that clearly explains what you are about to do. For example: "I will create a new task: 'Write report due tomorrow'. Does that sound right?" or "I will update the task 'Buy groceries' to have high urgency. Is that correct?".
+    - For **'update'** actions, identify the task(s) to be updated by name or other criteria. Determine which fields to change (e.g., 'dueDate', 'urgency', 'tags', 'completed'). If a user says "mark as done" or "complete", you should set the 'completed' field to 'true'. If they ask to mark as "not done" or "uncomplete", set it to 'false'. Include only the changed fields in the 'updates' object. To add or remove tags, use the 'tags' field with the final list of tags for the task.
+    - For **'delete'** actions, identify the task(s) to be deleted based on the user's criteria (e.g., by name, tag, or completion status like "delete all done tasks").
+    - You MUST generate a \`confirmationMessage\` that clearly explains what you are about to do. For example: "I will create a new task: 'Write report due tomorrow'. Does that sound right?" or "I will mark the task 'Buy groceries' as completed. Is that correct?".
     - You MUST populate the \`operations\` array with the specific steps of your plan.
 
 2.  **'parse'**: Use this only when the user provides a block of text that is clearly a list of tasks to be added, without any other conversational text. The next step in the application will be to parse this text.
@@ -65,7 +65,7 @@ Here is the user's request and current data:
 **Current Tasks:**
 {{#if tasks.length}}
 {{#each tasks}}
-- ID: {{id}}, Name: {{{name}}}, DueDate: {{dueDate}}, Urgency: {{urgency}}, Tags: [{{#each tags}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
+- ID: {{id}}, Name: {{{name}}}, DueDate: {{dueDate}}, Urgency: {{urgency}}, Completed: {{completed}}, Tags: [{{#each tags}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
 {{/each}}
 {{else}}
 (No tasks)
