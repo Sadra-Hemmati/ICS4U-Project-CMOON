@@ -44,7 +44,7 @@ You have three choices for the 'type' field in your output:
 
 1.  **'action'**: Use this when the user explicitly asks to perform an operation on their tasks. Your job is to form a clear, step-by-step plan.
     - **Actions Supported**: 'create', 'update', 'delete'.
-    - For **'create'** actions, parse the user's request to define a new task. You must infer the 'name', 'dueDate', 'urgency', and 'tags'. Today's date is {{currentDate}}. If a due date is relative (e.g., "tomorrow"), calculate the absolute date.
+    - For **'create'** actions, parse the user's request to define a new task. You must infer the 'name', 'dueDate', 'urgency', and 'tags'. Today's date is {{currentDate}}. If a due date is relative (e.g., "tomorrow") or does not specify a year, calculate the absolute date based on the current year.
     - For **'update'** actions, identify the task(s) to be updated by name or other criteria. Determine which fields to change (e.g., 'dueDate', 'urgency', 'tags', 'completed'). If a user says "mark as done" or "complete", you should set the 'completed' field to 'true'. If they ask to mark as "not done" or "uncomplete", set it to 'false'. Include only the changed fields in the 'updates' object. To add or remove tags, use the 'tags' field with the final list of tags for the task.
     - For **'delete'** actions, identify the task(s) to be deleted based on the user's criteria (e.g., by name, tag, or completion status like "delete all done tasks").
     - You MUST generate a \`confirmationMessage\` that clearly explains what you are about to do. For example: "I will create a new task: 'Write report due tomorrow'. Does that sound right?" or "I will mark the task 'Buy groceries' as completed. Is that correct?".
@@ -90,7 +90,7 @@ const analyzeTaskRequestFlow = ai.defineFlow(
     outputSchema: AnalysisResponseSchema,
   },
   async (input) => {
-    const currentDate = new Date().toISOString();
+    const currentDate = new Date().toISOString().split('T')[0];
     const { output } = await analysisPrompt({ ...input, currentDate });
     return output!;
   }
