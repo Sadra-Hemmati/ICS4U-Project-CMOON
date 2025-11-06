@@ -10,6 +10,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Bot, Calendar, LayoutDashboard, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -36,12 +37,14 @@ export function AppSidebar() {
          {!isMobile && <SidebarTrigger className="group-data-[collapsible=icon]:w-full" />}
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="flex-1" />
+      <SidebarFooter>
         <SidebarMenu>
           {navItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <Link href={item.href}>
                 <SidebarMenuButton
+                  size="lg"
                   isActive={pathname === item.href}
                   tooltip={{ children: item.label, side: 'right' }}
                 >
@@ -52,7 +55,7 @@ export function AppSidebar() {
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
-      </SidebarContent>
+      </SidebarFooter>
     </Sidebar>
   );
 }
