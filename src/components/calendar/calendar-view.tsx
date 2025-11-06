@@ -12,10 +12,9 @@ import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-function DayContent(props: DayContentProps) {
+function DayContent(props: DayContentProps & { onTaskClick: (task: Task) => void }) {
     const { tasks } = useApp();
     const tasksForDay = tasks.filter(task => isSameDay(task.dueDate, props.date));
-    const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(undefined);
     
     return (
         <div className="relative h-full w-full flex flex-col p-1">
@@ -26,7 +25,7 @@ function DayContent(props: DayContentProps) {
                 {tasksForDay.map(task => (
                     <div 
                         key={task.id}
-                        onClick={(e) => { e.stopPropagation(); setTaskToEdit(task); }}
+                        onClick={(e) => { e.stopPropagation(); props.onTaskClick(task); }}
                         className={cn(
                             "text-xs rounded-sm px-1 cursor-pointer hover:opacity-80 line-clamp-2",
                             task.completed ? 'line-through bg-green-900/50' : 'bg-primary/20'
@@ -36,11 +35,6 @@ function DayContent(props: DayContentProps) {
                     </div>
                 ))}
             </div>
-             <TaskFormSheet
-                open={!!taskToEdit}
-                onOpenChange={(isOpen) => !isOpen && setTaskToEdit(undefined)}
-                task={taskToEdit}
-              />
         </div>
     )
 }
@@ -78,6 +72,7 @@ function CustomCaption(props: CaptionProps) {
 export function CalendarView() {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(undefined);
     const [isClient, setIsClient] = useState(false);
     const [animationKey, setAnimationKey] = useState(0);
 
@@ -88,8 +83,14 @@ export function CalendarView() {
 
     const handleDayClick = (day: Date) => {
         setSelectedDate(day);
+        setTaskToEdit(undefined);
         setIsFormOpen(true);
     };
+
+    const handleTaskClick = (task: Task) => {
+        setTaskToEdit(task);
+        setIsFormOpen(true);
+    }
     
     if (!isClient) {
         return <Skeleton className="w-full h-full" />;
@@ -110,7 +111,6 @@ export function CalendarView() {
                     flex-direction: column;
                     flex-grow: 1;
                     width: 100%;
-                    height: 100%;
                 }
                 .rdp-table {
                     flex-grow: 1;
@@ -181,7 +181,7 @@ export function CalendarView() {
             <DayPicker
                 key={animationKey}
                 components={{ 
-                    DayContent, 
+                    DayContent: (props) => <DayContent {...props} onTaskClick={handleTaskClick} />, 
                     Caption: CustomCaption,
                 }}
                 showOutsideDays
@@ -194,10 +194,15 @@ export function CalendarView() {
 
             <TaskFormSheet 
                 open={isFormOpen}
-                onOpenChange={setIsFormOpen}
+                onOpenChange={(isOpen) => {
+                    if (!isOpen) {
+                        setIsFormOpen(false);
+                        setTaskToEdit(undefined);
+                    }
+                }}
+                task={taskToEdit}
                 defaultDate={selectedDate}
             />
         </div>
     );
 }
-
