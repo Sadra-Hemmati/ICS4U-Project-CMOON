@@ -52,18 +52,11 @@ export function CalendarView() {
         setIsClient(true);
     }, []);
 
-    useEffect(() => {
-        if (isClient) {
-            setSelectedDate(new Date());
-        }
-    }, [isClient]);
-
-
     const handleDayClick = (day: Date) => {
         setSelectedDate(day);
         setIsFormOpen(true);
     };
-
+    
     if (!isClient) {
         return <Skeleton className="w-full h-[700px]" />;
     }
