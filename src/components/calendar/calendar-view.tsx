@@ -69,14 +69,17 @@ export function CalendarView() {
                 }
                 .rdp-months {
                     height: 100%;
+                    width: 100%;
                 }
                 .rdp-month {
                     height: 100%;
+                    width: 100%;
                     display: flex;
                     flex-direction: column;
                 }
                 .rdp-table {
                     flex-grow: 1;
+                    width: 100%;
                     border-collapse: separate;
                     border-spacing: 4px;
                 }
