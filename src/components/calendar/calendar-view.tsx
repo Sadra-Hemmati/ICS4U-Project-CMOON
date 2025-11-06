@@ -88,6 +88,7 @@ export function CalendarView() {
                 }
                 .rdp-row {
                     height: calc(100% / 6); /* Adjust based on number of weeks shown */
+                    width: 100%;
                 }
                 .rdp-day {
                     height: 100%;
