@@ -29,8 +29,10 @@ export const ActionPlanSchema = z.object({
   messageId: z
     .string()
     .describe('The ID of the message that this plan is associated with.'),
-  type: z.literal('action'),
-  action: z.literal('delete').describe('The type of action to perform.'),
+  type: z.string().describe("Must be the string 'action'."),
+  action: z
+    .string()
+    .describe("The type of action to perform. Currently, only 'delete' is supported."),
   tasks: z
     .array(TaskSchema)
     .describe('The tasks that will be affected by the action.'),
@@ -43,14 +45,14 @@ export const ActionPlanSchema = z.object({
 export type ActionPlan = z.infer<typeof ActionPlanSchema>;
 
 const ParsePlanSchema = z.object({
-  type: z.literal('parse'),
+  type: z.string().describe("Must be the string 'parse'."),
   reasoning: z
     .string()
     .describe('Explanation of why the model chose to parse the text.'),
 });
 
 const TextResponseSchema = z.object({
-  type: z.literal('response'),
+  type: z.string().describe("Must be the string 'response'."),
   textResponse: z
     .string()
     .describe('A simple text response when no specific action is needed.'),
