@@ -42,15 +42,6 @@ export function PanicButton() {
           tags: task.tags,
         }));
 
-      if (nonCompletedTasks.length === 0) {
-        // This is a simplified plan for when there are no tasks
-        setPlan({
-            summary: { totalTasks: 0, totalWorkHours: 0, highPriorityHours: 0, overdueTasks: 0, dueToday: 0, dueThisWeek: 0 },
-            actionPlan: [{ title: 'All Clear!', description: "You have no pending tasks. Great job!", tasks: [] }]
-        });
-        setIsLoading(false);
-        return;
-      }
       
       const result = await panicModeScheduleAnalysis({ tasks: nonCompletedTasks });
       setPlan(result);

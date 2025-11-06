@@ -62,7 +62,7 @@ export async function panicModeScheduleAnalysis(
 
   const { output } = await panicModeScheduleAnalysisFlow(input);
 
-  if (!output) {
+  if (!output?.actionPlan) {
     // This is a fallback in case the AI model fails to return a structured response.
     return {
       summary,
