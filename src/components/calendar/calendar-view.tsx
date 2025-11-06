@@ -19,7 +19,7 @@ function DayContent(props: DayContentProps) {
     
     return (
         <div className="relative h-full w-full flex flex-col">
-            <div className="p-1">
+            <div className="flex justify-center p-1">
                 <p className='text-xs text-muted-foreground'>{props.date.getDate()}</p>
             </div>
             <div className='flex-1 overflow-y-auto space-y-1 p-1 pt-0'>
