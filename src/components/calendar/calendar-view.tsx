@@ -119,6 +119,7 @@ export function CalendarView() {
                     border-collapse: separate;
                     border-spacing: 4px;
                     table-layout: fixed;
+                    height: 100%;
                 }
                  .rdp-tbody {
                     height: 100%;
@@ -181,7 +182,8 @@ export function CalendarView() {
                     months: 'flex flex-col flex-1 w-full h-full',
                     month: 'flex flex-col flex-1 w-full h-full',
                     table: 'w-full h-full table-fixed border-collapse border-spacing-1',
-                    row: 'w-full',
+                    tbody: 'h-full',
+                    row: 'w-full h-full',
                     day: 'day-animated',
                 }}
             />
